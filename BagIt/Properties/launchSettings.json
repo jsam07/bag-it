@@ -1,4 +1,9 @@
 {
+  "UsersDbSettings": {
+    "CollectionName": "Users",
+    "ConnectionString": "mongodb+srv://jfoxx:<password>@cluster0.px8ie.mongodb.net/test",
+    "DatabaseName": "test"
+  },
   "profiles": {
     "Windows Machine": {
       "commandName": "MsixPackage",

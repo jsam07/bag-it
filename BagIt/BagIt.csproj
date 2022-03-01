@@ -32,10 +32,7 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon
-			Include="Resources\appicon.svg"
-			ForegroundFile="Resources\appiconfg.svg"
-			Color="#512BD4" />
+		<MauiIcon Include="Resources\appicon.svg" ForegroundFile="Resources\appiconfg.svg" Color="#512BD4" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\appiconfg.svg" Color="#512BD4" />
@@ -59,7 +56,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Remove="Properties\launchSettings.json" />
+	  <PackageReference Include="MongoDB.Driver" Version="2.14.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Controllers" />
 	</ItemGroup>
 
 </Project>
