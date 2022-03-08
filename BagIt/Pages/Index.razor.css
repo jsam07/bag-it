@@ -1,0 +1,53 @@
+﻿@font-face {
+    font-family: 'Rubik', sans-serif;
+    src: url('../wwwroot/fonts/Rubik-Regular.ttf');
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1em;
+    height: 90vh;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-container input {
+    border-style: none;
+    font-size: 1.2rem;
+    font-style: italic;
+}
+
+.list-container {
+    text-align: center;
+    padding-top: 1em;
+    height: 80vh;
+}
+
+.list-container ul {
+    list-style: none;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-button {
+    text-align: center;
+    margin: 1em;
+    padding: 0.5em 2em 0.5em 2em;
+    border-style: none;
+    border-radius: 10px;
+    background-color: #E74747;
+    font-style: normal;
+    font-size: 0.9rem;
+    color: #FFFFFF;
+    width: 100px;
+}
+
+
+

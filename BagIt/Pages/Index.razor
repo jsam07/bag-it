@@ -3,8 +3,22 @@
 @using BagIt.Models
 @inject UserService UService
 
-<h1>Hello, world!</h1>
-
-Welcome BagIt.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+<form class="form-container">
+    <div class="input-container">
+        <input type="text" name="title" value="Smoothie Party" />
+        <input type="text" name="date" value="March 8, 2022" />
+    </div>
+    <div class="list-container">
+        <ul>
+            <li>Bananas</li>
+            <li>Apples</li>
+            <li>Oranges</li>
+        </ul>
+    </div>
+    <div class="button-container">
+        	<NavLink href="viewcategory" Match="NavLinkMatch.All">
+                <input class="form-button" type="submit" name="cancel" value="Cancel" />
+			</NavLink>
+        <input class="form-button" type="submit" name="save" value="Save" />
+    </div>
+</form>
