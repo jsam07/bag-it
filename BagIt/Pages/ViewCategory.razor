@@ -1,0 +1,28 @@
+﻿@page "/viewcategory"
+
+<main class="view-category-container">
+    <h2>Fruits</h2>
+    <table class="table-container">
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            
+            @foreach (string product in products)
+            {
+            <div class="product-description">
+                <td>@product</td>
+                <td class="add-button" type="submit">+</td>
+            </div>
+            }
+        </tr>
+    </table>
+    <NavLink href="/" Match="NavLinkMatch.All">
+        <input class="form-button" type="submit" value="My List" />
+	</NavLink>
+</main>
+
+@functions {
+    string[] products = { "Bananas", "Apples", "Oranges", "Kiwi", "Jackfruit", "Watermelon", "Peaches", "Starfruit" };
+}

@@ -57,9 +57,11 @@
 
 	<ItemGroup>
 	  <None Remove="Pages\Index.razor.css" />
+	  <None Remove="Pages\ViewCategory.razor.css" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Include="Pages\ViewCategory.razor.css" />
 	  <Content Include="Pages\Index.razor.css" />
 	</ItemGroup>
 
