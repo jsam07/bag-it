@@ -1,59 +1,53 @@
 ﻿@font-face {
     font-family: 'Rubik', sans-serif;
-    src: url('../wwwroot/fonts/Rubik-Regular.ttf');
+    src: url('./fonts/Rubik-Regular.ttf');
 }
 
 h2 {
     margin-top: 1em;
     font-family: 'Rubik', sans-serif;
     text-align: center;
-    color: #E74747;
+    color: #FFFFFF;
     font-size: 1.5em;
-    
 }
 
 .view-category-container {
     display: flex;
     flex-direction: column;
-    width: 90%;
-    min-height: 90vh;
+    align-items: center;
+    background-color: #2C6D6A;
+    min-height: 100vh;
 }
 
-.table-container {
+.table-container{
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    align-content: space-evenly;
 }
 
 .product-description {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1em;
-    margin: 1em 0 1em 0;
-    width: 100%;
-    font-size: 1.2rem;
-}
-
-.add-button,
-.form-button {
-    text-align: center;
-    border-style: none;
-    border-radius: 10px;
-}
-
-.add-button {
-    border-radius: 5px;
-    font-style: normal;
-    font-weight: 800;
-    color: #E74747;
-}
-
-.form-button {
-    margin: 1em;
-    padding: 0.5em 2em 0.5em 2em;
-    background-color: #E74747;
-    font-size: 0.9rem;
+    display: inline-block;
+    font-weight: 700;
+    font-size: 0.8rem;
     color: #FFFFFF;
+    margin: 1em;
+    border-radius: 5px;
+    background-color: #12615D;
     width: 100px;
+    height: 100px;
+}
+
+.product-description:hover {
+    background-color: #1F4846;
+}
+
+.form-button {
+    background-color: #12615D;
+    color: #FFFFFF;
+    padding: 1em 3em 1em 3em;
+    font-weight: 700;
+    margin-bottom: 3em;
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #FFFFFF;
 }

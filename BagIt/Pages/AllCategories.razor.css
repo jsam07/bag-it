@@ -1,0 +1,47 @@
+﻿@font-face {
+    font-family: 'Rubik', sans-serif;
+    src: url('./fonts/Rubik-Regular.ttf');
+}
+
+* {
+    text-decoration: none;
+}
+
+.category-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1em;
+    text-align: center;
+}
+
+    .category-container li {
+        list-style-type: none;
+        font-family: 'Rubik', sans-serif;
+        font-weight: 700;
+        color: #FFFFFF;
+        padding: 1em 3em 1em 3em;
+        margin: 1em;
+        border-radius: 5px;
+        background-color: #12615D;
+    }
+
+        .category-container li:hover {
+            background-color: #1F4846;
+        }
+
+
+.form-button {
+    background-color: #12615D;
+    color: #FFFFFF;
+    padding: 1em 3em 1em 3em;
+    font-weight: 700;
+    margin-bottom: 3em;
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #FFFFFF;
+}
+
+    .form-button:hover {
+        background-color: #1F4846;
+    }

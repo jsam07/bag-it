@@ -1,0 +1,26 @@
+﻿@page "/viewlist"
+@using BagIt.Services
+@using BagIt.Models
+@inject UserService UService
+
+<form class="form-container">
+    <div class="input-container">
+        <input type="text" name="title" value="Smoothie Party" />
+        <input type="text" name="date" value="March 8, 2022" />
+    </div>
+    <div class="list-container">
+        <ul>
+            <li>Bananas</li>
+            <li>Apples</li>
+            <li>Oranges</li>
+        </ul>
+    </div>
+    <div class="button-container">
+        	<NavLink href="/" Match="NavLinkMatch.All">
+                <input class="form-button" type="submit" name="cancel" value="Cancel" />
+			</NavLink>
+            <NavLink href="allcategories" Match="NavLinkMatch.All">
+                <input class="form-button" type="submit" name="save" value="Add" />
+            </NavLink>
+    </div>
+</form>
