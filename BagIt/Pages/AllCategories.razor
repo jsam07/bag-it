@@ -1,0 +1,19 @@
+﻿@page "/allcategories"
+
+<div class="category-container">
+    <ul>
+    @foreach (var category in categories)
+    {
+        <NavLink href="viewcategory" Match="NavLinkMatch.All">
+            <li>@category</li>
+		</NavLink>
+    }
+    </ul>
+    <NavLink href="/" Match="NavLinkMatch.All">
+        <input class="form-button" type="submit" value="Cancel" />
+	</NavLink>
+</div>
+
+@code {
+    string[] categories = new string[] { "Fruits & Vegetables", "Bread & Pastries", "Dairy", "Meat & Fish", "Spices", "Frozen Convenience", "Grain Products", "Snacks", "Beverages", "Househould Products", "Care & Health Products", "Pet Supplies", "Home & Garden" };
+}

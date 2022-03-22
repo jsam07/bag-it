@@ -3,22 +3,14 @@
 @using BagIt.Models
 @inject UserService UService
 
-<form class="form-container">
-    <div class="input-container">
-        <input type="text" name="title" value="Smoothie Party" />
-        <input type="text" name="date" value="March 8, 2022" />
-    </div>
-    <div class="list-container">
-        <ul>
-            <li>Bananas</li>
-            <li>Apples</li>
-            <li>Oranges</li>
-        </ul>
-    </div>
-    <div class="button-container">
-        	<NavLink href="viewcategory" Match="NavLinkMatch.All">
-                <input class="form-button" type="submit" name="cancel" value="Cancel" />
-			</NavLink>
-        <input class="form-button" type="submit" name="save" value="Save" />
-    </div>
-</form>
+<div class="list-container">
+    <NavLink href="/viewlist" Match="NavLinkMatch.All">
+        <input id="new-list" class="form-button" type="submit" value="New List" />
+	</NavLink>
+    <NavLink href="/existing-list" Match="NavLinkMatch.All">
+        <input id="existing-list" class="form-button" type="submit" value="Existing List" />
+	</NavLink>
+    <NavLink href="/existing-list" Match="NavLinkMatch.All">
+        <input id="existing-list" class="form-button" type="submit" value="Existing List" />
+	</NavLink>
+</div>

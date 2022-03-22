@@ -56,11 +56,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Pages\AllCategories.razor.css" />
+	  <None Remove="Pages\Index - Copy.razor.css" />
 	  <None Remove="Pages\Index.razor.css" />
 	  <None Remove="Pages\ViewCategory.razor.css" />
+	  <None Remove="Pages\ViewList.razor.css" />
+	  <None Remove="Resources\Images\category-bg.jpg" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Include="Pages\AllCategories.razor.css" />
+	  <Content Include="Pages\ViewList.razor.css" />
 	  <Content Include="Pages\ViewCategory.razor.css" />
 	  <Content Include="Pages\Index.razor.css" />
 	</ItemGroup>
@@ -71,6 +77,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Controllers" />
+	  <Folder Include="wwwroot\images\" />
 	</ItemGroup>
 
 </Project>

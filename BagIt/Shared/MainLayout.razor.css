@@ -1,25 +1,23 @@
 @font-face {
     font-family: 'Rubik', sans-serif;
-    src: url('../wwwroot/fonts/Rubik-Regular.ttf');
+    src: url('./fonts/Rubik-Regular.ttf');
 }
 
 * {
     margin: 0 auto;
     padding: 0;
+    background-color: #2C6D6A;
 }
 
 .container {
     width: 90%;
 }
 
-li {
-    list-style: none;
-}
-
 h1 {
     margin-top: 0.1em;
-    font-family: 'Rubik', sans-serif;
     font-size: 2rem;
     font-weight: 800;
-    color: #E74747;
+    color: #FFFFFF;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
 }
