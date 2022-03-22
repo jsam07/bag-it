@@ -3,8 +3,14 @@
 @using BagIt.Models
 @inject UserService UService
 
-<div class="category-container">
-    <NavLink href="/" Match="NavLinkMatch.All">
-        <input class="form-button" type="submit" value="New List" />
+<div class="list-container">
+    <NavLink href="/viewlist" Match="NavLinkMatch.All">
+        <input id="new-list" class="form-button" type="submit" value="New List" />
+	</NavLink>
+    <NavLink href="/existing-list" Match="NavLinkMatch.All">
+        <input id="existing-list" class="form-button" type="submit" value="Existing List" />
+	</NavLink>
+    <NavLink href="/existing-list" Match="NavLinkMatch.All">
+        <input id="existing-list" class="form-button" type="submit" value="Existing List" />
 	</NavLink>
 </div>
