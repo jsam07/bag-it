@@ -1,16 +1,106 @@
 ﻿@page "/"
-@using BagIt.Services
-@using BagIt.Models
-@inject UserService UService
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using Microsoft.Extensions.DependencyInjection
+@using Models;
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
 
-<div class="list-container">
+<main class="view-category-container">
+    <h2>Fruit</h2>
+    <p>@test</p>
+    <div>
+        <ul>
+            @foreach (Product item in itemList.ToArray())
+            {
+                <div>
+                    <li>@item.Name
+                        <span>
+                            <button type="button" @onclick="() => DeleteItem(item.Name)">x</button>
+                        </span>
+                    </li>
+                </div>
+            }
+        </ul>
+    </div>
+    <table class="table-container">
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            @foreach (string product in products)
+            {
+            <div class="product-description">
+                <td><button type="button" @onclick="() => AddToList(product)">@product</button></td>
+            </div>
+            }
+        </tr>
+    </table>
     <NavLink href="/viewlist" Match="NavLinkMatch.All">
-        <input id="new-list" class="form-button" type="submit" value="New List" />
+        <input class="form-button" type="submit" value="My List" />
 	</NavLink>
-    <NavLink href="/existing-list" Match="NavLinkMatch.All">
-        <input id="existing-list" class="form-button" type="submit" value="Existing List" />
-	</NavLink>
-    <NavLink href="/existing-list" Match="NavLinkMatch.All">
-        <input id="existing-list" class="form-button" type="submit" value="Existing List" />
-	</NavLink>
-</div>
+</main>
+
+@functions {
+    string[] products = { "Bananas", "Apples", "Oranges", "Kiwi", "Jackfruit", "Watermelon", "Peaches", "Starfruit" };
+}
+
+@code {
+    private HubConnection hubConnection;
+    private List<string> messages = new List<string>();
+    public string test = "";
+    public List<Product> itemList = new List<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:7210/listHub")
+
+            .Build();
+
+        hubConnection.On<string>("ItemsUpdated", (string results) =>
+        {
+            Console.WriteLine(results);
+            itemList = JsonSerializer.Deserialize<List<Product>>(results);
+            StateHasChanged();
+        //AppendList(listArray); 
+    });
+
+        await hubConnection.StartAsync();
+        await hubConnection.InvokeAsync("GetList", "list id");
+    }
+
+    public void AppendList(List<Product> listArray)
+    {
+        foreach (Product item in listArray)
+        {
+            itemList.Add(item);
+        }
+        StateHasChanged();
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    //public async void load() => await hubConnection.InvokeAsync("GetList", "list id");
+
+    public async Task AddToList(string selectedItemName)
+    {
+        await hubConnection.InvokeAsync("AddItemToList", selectedItemName, "1");
+    }
+
+        public async Task DeleteItem(string selectedItemName)
+    {
+        await hubConnection.InvokeAsync("RemoveItemFromList", selectedItemName);
+    }
+}
