@@ -3,11 +3,42 @@
     src: url('./fonts/Rubik-Regular.ttf');
 }
 
-.list-container {
+h2 {
+    margin-top: 1em;
+    font-family: 'Rubik', sans-serif;
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 1.5em;
+}
+
+.view-category-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
+    background-color: #2C6D6A;
+    min-height: 100vh;
+}
+
+.table-container{
+    display: flex;
+    flex-direction: row;
+    align-content: space-evenly;
+}
+
+.product-description {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #FFFFFF;
+    margin: 1em;
+    border-radius: 5px;
+    background-color: #12615D;
+    width: 100px;
+    height: 100px;
+}
+
+.product-description:hover {
+    background-color: #1F4846;
 }
 
 .form-button {
@@ -19,14 +50,4 @@
     border-style: solid;
     border-radius: 5px;
     border-color: #FFFFFF;
-    width: 70vw;
-}
-
-.form-button:hover {
-    background-color: #1F4846;
-}
-
-#new-list {
-    margin-top: 1em;
-    height: 30vh;
 }
