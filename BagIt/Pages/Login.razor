@@ -7,6 +7,14 @@
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
 @inject NavigationManager NavManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+@*protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await localStorage.SetItemAsync("name", "John Smith");
+        var name = await localStorage.GetItemAsync<string>("name");
+    }*@
 
 
 <div class="min-h-full flex">
@@ -93,6 +101,16 @@
     static HttpClient client = new HttpClient();
     public string url = "https://localhost:7210/api/user/login";
 
+    protected override async Task OnParametersSetAsync ()
+    {
+        bool isTokenValid = await IsTokenValidAsync();
+
+        if (isTokenValid)
+        {
+            NavigateToLists();
+        }
+    }
+
 
     public async Task PostLogin()
     {
@@ -112,11 +130,13 @@
             } 
 
 
-            // Nagivate user to other page here
-            // User Authenticated
             var jsonString = await response.Content.ReadAsStringAsync();
             token = JsonConvert.DeserializeObject<JWToken>(jsonString);
-            
+
+            await localStorage.SetItemAsync("token", token); 
+
+            NavigateToLists();
+
         } catch (Exception e)
         {
             Console.WriteLine("Error logging in");
@@ -131,6 +151,30 @@
     public void NavigateToRegister()
     {
         NavManager.NavigateTo("/register");
+    }
+
+    public void NavigateToLists()
+    {
+        NavManager.NavigateTo("/lists");
+    }
+
+    private async Task<bool> IsTokenValidAsync()
+    {
+
+        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
+
+        if(jwt == null)
+        {
+            return false;
+        }
+
+        if(jwt.Expiration <= DateTime.UtcNow)
+        {
+            await localStorage.RemoveItemAsync("token");
+            return false;
+        }
+
+        return true;
     }
 
 }   

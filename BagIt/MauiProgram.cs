@@ -1,4 +1,5 @@
 ﻿using BagIt.Models;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.WebView.Maui;
 
 namespace BagIt;
@@ -21,6 +22,7 @@ public static class MauiProgram
 		);
 
 		builder.Services.AddBlazorWebView();
+		builder.Services.AddBlazoredLocalStorage();
 
 		return builder.Build();
 	}
