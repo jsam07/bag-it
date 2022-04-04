@@ -1,0 +1,44 @@
+﻿@page "/register"
+@using Models
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+@using System.Text.Json
+
+<div>
+    <input type="text" name="Username" placeholder="Username" @bind="Username" />
+    <input type="text" name="Email" placeholder="Email" @bind="Email" />
+    <input type="password" name="Password" placeholder="Password" @bind="Password" />
+    <button type="button" @onclick="PostRegister">Register</button>
+    @message
+</div>
+
+@code {
+    static HttpClient client = new HttpClient();
+    public string Username;
+    public string Email;
+    public string Password;
+    public string url = "https://localhost:7210/api/user/register";
+    public string message = "";
+
+    public async Task PostRegister()
+    {
+        try
+        {
+            var user = new User{
+                Username = this.Username,
+                Email = this.Email,
+                Password = this.Password
+            };
+
+
+            HttpResponseMessage response = await client.PostAsJsonAsync(url, user);
+            message = "User successfully created";
+
+        } catch (Exception e)
+        {
+            throw new Exception("Error registering user");
+        }
+       
+    }
+}
