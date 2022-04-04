@@ -1,44 +1,41 @@
-﻿@page "/register"
+﻿@page "/login"
 @using Models
 @using System.Net.Http
 @using System.Net.Http.Headers
 @using System.Net.Http.Json
 @using System.Text.Json
+@using Newtonsoft.Json.Linq
 
 <div>
-    <input type="text" name="Username" placeholder="Username" @bind="Username" />
     <input type="text" name="Email" placeholder="Email" @bind="Email" />
     <input type="password" name="Password" placeholder="Password" @bind="Password" />
-    <button type="button" @onclick="PostRegister">Register</button>
-    @message
+    <button type="button" @onclick="PostRegister">Login</button>
+    <p>@token?.token</p>
 </div>
 
 @code {
     static HttpClient client = new HttpClient();
-    public string Username;
     public string Email;
     public string Password;
-    public string url = "https://localhost:7210/api/user/register";
-    public string message = "";
+    public string url = "https://localhost:7210/api/user/login";
+    public JWToken token;
 
     public async Task PostRegister()
     {
         try
         {
             var user = new User{
-                Username = this.Username,
                 Email = this.Email,
                 Password = this.Password
             };
 
-
             HttpResponseMessage response = await client.PostAsJsonAsync(url, user);
-            message = "User successfully created";
+            token = await response.Content.ReadAsAsync<JWToken>();
 
         } catch (Exception e)
         {
-            throw new Exception("Error registering user");
+            throw new Exception("Error logging in");
         }
-       
+        var poop = "poop";
     }
-}
+}   
