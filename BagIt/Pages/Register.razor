@@ -1,0 +1,16 @@
+﻿@page "/register"
+
+<div>
+    <form method="post" action="https://localhost:7210/api/user/register" > 
+        <input type="text" name="Username" @bind="Username" />
+        <input type="text" name="Email" @bind="Email" />
+        <input type="text" name="Password" @bind="Password" />
+        <input type="submit" value="Register" />
+    </form>
+</div>
+
+@code {
+   public string Username;
+   public string Email;
+   public string Password;
+}

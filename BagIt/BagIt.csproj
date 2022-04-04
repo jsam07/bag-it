@@ -56,6 +56,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Pages\AllCategories - Copy.razor.css" />
 	  <None Remove="Pages\AllCategories.razor.css" />
 	  <None Remove="Pages\Index - Copy.razor.css" />
 	  <None Remove="Pages\Index.razor.css" />
