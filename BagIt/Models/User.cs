@@ -26,11 +26,15 @@ public class User
     [DisplayName("Last Name")]
     [MaxLength(50, ErrorMessage="Last Name must be 50 characters or less")]
     public string? LastName { get; set; }
+
+    [Required(ErrorMessage = "Password is required")]
     public string? Password { get; set; }
     public string? Address { get; set; }
+
+    [Phone]
     public string? Phone { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? ModifiedAt { get; set; }
     
-    public List<UserShoppingList> UserShoppingLists { get; set; }
+    public List<UserShoppingList>? UserShoppingLists { get; set; }
 }
