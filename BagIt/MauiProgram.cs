@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.WebView.Maui;
-using BagIt.Data;
-using BagIt.Models;
-using BagIt.Services;
+﻿using BagIt.Models;
+using Microsoft.AspNetCore.Components.WebView.Maui;
 
 namespace BagIt;
 
@@ -21,10 +19,8 @@ public static class MauiProgram
 		builder.Services.Configure<UsersDbSettings>(
 			builder.Configuration.GetSection("UsersDbSettings")
 		);
-		
+
 		builder.Services.AddBlazorWebView();
-		builder.Services.AddSingleton<WeatherForecastService>();
-		builder.Services.AddSingleton<UserService>();
 
 		return builder.Build();
 	}
