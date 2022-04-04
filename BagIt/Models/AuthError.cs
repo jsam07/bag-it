@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace BagIt.Models
 {
-    public class JWToken
+    public class AuthError
     {
-        [JsonProperty("token")]
-        public string Token { get; set; }
-        public DateTime Expiration { get; set; }
+        public string Message { get; set; }
     }
 }

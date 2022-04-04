@@ -15,7 +15,8 @@ public class User
     public string? Username { get; set; }
     
     [DisplayName("Email")]
-    [Required(ErrorMessage = "An email address is required.")]
+    [EmailAddress(ErrorMessage = "Invalid email address")]
+    [Required(ErrorMessage = "Email address is required")]
     public string Email { get; set; }
     
     [DisplayName("First Name")]
