@@ -1,21 +1,88 @@
-﻿@page "/lists"
-@using Models
-@using System.Net.Http
-@using System.Net.Http.Headers
-@using System.Net.Http.Json
+﻿@page "/viewlists"
+@using BagIt.Models
+@using Microsoft.AspNetCore.SignalR.Client
 @using System.Text.Json
-@using Newtonsoft.Json
-@using Newtonsoft.Json.Linq
-@inject NavigationManager NavManager
+@using System.Text.Json.Serialization
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavManager
 
-
-<div class="min-h-full flex">
-  Welcome to list page
-</div>
+<form class="form-container">
+    <div class="input-container">
+        <InputText @bind="newListInput" type="text" name="title"  />
+        <button type="button" @onclick="CreateNewList">New List</button>
+    </div>
+    <div class="list-container">
+        <ul>
+            
+        </ul>
+        <p>@userLists? userLists[0].Name : ''</p>
+        
+    </div>  
+</form>
 
 @code {
+    private HubConnection hubConnection;
+    public List<ShoppingList> userLists;
+    public string newListInput;
 
-    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            JWToken jwt = await GetTokenAsync();
 
-}   
+            if(jwt == null)
+            {
+                NavigateToLogin();
+                return;
+            }
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5036/listHub", options =>
+                { 
+                    options.AccessTokenProvider = () => Task.FromResult(jwt.Token);
+                })
+                .Build();
+
+            hubConnection.On<string>("ListsUpdated", (string results) =>
+            {
+                Console.WriteLine(results);
+                userLists = JsonSerializer.Deserialize<List<ShoppingList>>(results);
+                StateHasChanged();
+            //AppendList(listArray); 
+            });
+
+            await hubConnection.StartAsync();
+            await hubConnection.InvokeAsync("GetUserLists");
+        } catch(Exception e)
+        {
+            Console.WriteLine("Unable to connect to hub");
+            Console.WriteLine(e);
+        }
+    }
+
+    public void NavigateToLogin()
+    {
+        NavManager.NavigateTo("/login");
+    }
+
+    public async Task CreateNewList()
+    {
+        await hubConnection.InvokeAsync("NewList", newListInput);
+    }
+
+    public async Task<JWToken> GetTokenAsync()
+    {
+        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
+
+        if(jwt != null)
+        {
+            if(jwt.Expiration <= DateTime.UtcNow)
+            {
+                await localStorage.RemoveItemAsync("token");
+                jwt = null;
+            }
+        }
+        return jwt;
+    }
+}

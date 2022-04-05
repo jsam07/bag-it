@@ -10,7 +10,6 @@
 
 <main class="view-category-container">
     <h2>Fruit</h2>
-    <p>@test</p>
     <div>
         <ul>
             @foreach (Product item in itemList.ToArray())
@@ -51,7 +50,6 @@
 @code {
     private HubConnection hubConnection;
     private List<string> messages = new List<string>();
-    public string test = "";
     public List<Product> itemList = new List<Product>();
 
     protected override async Task OnInitializedAsync()
