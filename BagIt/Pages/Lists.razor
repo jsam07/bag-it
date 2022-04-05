@@ -11,12 +11,20 @@
 @inject NavigationManager NavManager
 
  <main>
-@if (userList)
-{
+@if (!userLists.Any())
+    {
     <div class="list-container">
         <div class="text-center">
-            <h3 class="mt-2 text-sm font-medium text-gray-900">@title</h3>
-            <p class="list-description mt-1 text-sm text-gray-500">@description</p>
+            <ul>
+                @foreach (ShoppingList list in userLists.ToArray())
+                {
+                    <li class="mt-2 text-sm font-medium text-gray-900">@list.Name
+                        <span>
+                            @*<button type="button" @onclick="() => DeleteItem(list.ListId)">x</button>*@
+                        </span>
+                    </li>
+                }
+            </ul>
         </div>
         <div class="user-container">
             <div class="text-center">
@@ -30,49 +38,133 @@
                 </button>
             </div>
         </div>
-
     </div>
-    <div>
-        <NewListCard />
-    </div>
-    } else if (!userList)
+    <div class="list-container">
+        <div class="text-center">
+            <form class="form-container">
+                <input @bind="newListInput" class="px-4 py-2 border border-transparent w-64" type="text" name="title" placeholder="List Name" />
+                <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent w-64 shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" @onclick="CreateNewList">
+                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    New List
+                </button>
+            </form>
+        </div>
+        </div>
+    } else
     {
     <div class="list-container">
         <div class="text-center">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">No list</h3>
-          <p class="mt-1 text-sm text-gray-500">Get started by creating a new list.</p>
-          <div class="mt-6">
-            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent w-64 shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <!-- Heroicon name: solid/plus -->
-              <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-              </svg>
-              New List
-            </button>
-          </div>
+            <ul>
+                <li class="mt-2 text-sm font-medium text-gray-900">
+                    Oh no.
+                </li>
+                <li class="mt-2 text-sm font-medium text-gray-900">
+                    You have no list created yet.
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="list-container">
+        <div class="text-center">
+            <form class="form-container">
+                <input @bind="newListInput" class="px-4 py-2 border border-transparent w-64" type="text" name="title" placeholder="List Name" />
+                <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent w-64 shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" @onclick="CreateNewList">
+                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    New List
+                </button>
+            </form>
         </div>
     </div>
     }
 </main>
 
 @code {
-    bool userList = true;
-    string title = "Groceries";
-    string description = "Suzie's Birthday";
+    private HubConnection hubConnection;
+    public List<ShoppingList> userLists = new List<ShoppingList>();
+    public string newListInput;
+    public string name;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            JWToken jwt = await GetTokenAsync();
+
+            if(jwt == null)
+            {
+                NavigateToLogin();
+                return;
+            }
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl($"http://localhost:5036/listHub?access_token={jwt.Token}")
+                .Build();
+
+            hubConnection.On<string>("ListsUpdated", (string results) =>
+            {
+                Console.WriteLine(results);
+                userLists = JsonSerializer.Deserialize<List<ShoppingList>>(results);
+                StateHasChanged();
+            //AppendList(listArray); 
+            });
+
+            await hubConnection.StartAsync();
+            await hubConnection.InvokeAsync("GetUserLists");
+        } catch(Exception e)
+        {
+            Console.WriteLine("Unable to connect to hub");
+            Console.WriteLine(e);
+        }
+    }
+
+    public void NavigateToLogin()
+    {
+        NavManager.NavigateTo("/login");
+    }
+
+    public async Task DeleteItem()
+    {
+        await hubConnection.InvokeAsync("DeleteItem", name);
+    }
+
+    public async Task CreateNewList()
+    {
+        NavManager.NavigateTo("/addList");
+    }
+
+    public async Task<JWToken> GetTokenAsync()
+    {
+        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
+
+        if(jwt != null)
+        {
+            if(jwt.Expiration <= DateTime.UtcNow)
+            {
+                await localStorage.RemoveItemAsync("token");
+                jwt = null;
+            }
+        }
+        return jwt;
+    }
 }
 
 
-
 <style>
+    input {
+        display: block;
+        border-radius: 5px;
+    }
+
     main {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background-color: #0D1829;
+        background-color: #white;
     }
 
     button {
@@ -81,7 +173,7 @@
     }
 
     .list-container {
-        background-color: white;
+        background-color: #F2F2F2;
         min-width: 320px;
         padding: 20px;
         margin: 20px;
@@ -111,5 +203,11 @@
 
     .user-container button {
         margin: 5px;
+    }
+
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 </style>
