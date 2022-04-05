@@ -22,13 +22,7 @@
               </div>
             </div>
             <div class="hidden space-x-8 md:flex md:ml-10">
-              <a href="#" class="text-base font-medium text-white hover:text-gray-300">Product</a>
-
-              <a href="#" class="text-base font-medium text-white hover:text-gray-300">Features</a>
-
-              <a href="#" class="text-base font-medium text-white hover:text-gray-300">Marketplace</a>
-
-              <a href="#" class="text-base font-medium text-white hover:text-gray-300">Company</a>
+              <button type="button" @onclick="NavigateToList" class="text-base font-medium text-white hover:text-gray-300">Product</button>
             </div>
           </div>
           <div class="hidden md:flex md:items-center md:space-x-6">
@@ -103,6 +97,11 @@
     public void NavigateToHome()
     {
         NavManager.NavigateTo("/");
+    }
+
+    public void NavigateToList()
+    {
+        NavManager.NavigateTo("/list");
     }
 
 

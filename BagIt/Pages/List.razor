@@ -1,0 +1,67 @@
+﻿@page "/list"
+@using Models
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+@using System.Text.Json
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.Web
+@using System.Globalization
+@inject NavigationManager NavManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+<div class="bg-white">
+  <div class="max-w-7xl mx-auto overflow-hidden sm:px-6 lg:px-8">
+    <h2 class="sr-only">Products</h2>
+
+    <div class="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3 lg:grid-cols-4">
+      @foreach (Product product in products)
+      {
+          <div class="group relative p-4 border-r border-b border-gray-200 sm:p-6">
+          <div class="rounded-lg flex flex-col bg-gray-100">
+              <button type="button" class="ml-auto m-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 hover:fill-teal-700" viewBox="0 0 20 20" fill="currentColor" >
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                  </svg>
+              </button>
+              <div class=" overflow-hidden group-hover:opacity-75">
+                <img src="@product.Icon" alt="Pomegranate" class="w-full px-8 h-full object-center object-cover" />
+              </div>
+              <h1 class="text-xl my-4 mx-auto font-bold text-gray-900">
+                  @product.Name
+              </h1>
+          </div>
+      </div>
+      }
+    </div>
+  </div>
+</div>
+
+@code {
+    List<Product> products = new List<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        GenerateDefaultProducts();
+    }
+
+    private void GenerateDefaultProducts()
+    {
+        string[] p = { System.AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "icons" };
+        string iconsDir = Path.Combine(p);
+        string[] directories = Directory.GetDirectories(iconsDir);
+        foreach (string directory in directories)
+        {
+            foreach (string iconFile in Directory.GetFiles(directory))
+            {
+                TextInfo ti = new CultureInfo("en-US",false).TextInfo;
+                string name = ti.ToTitleCase(Path.GetFileNameWithoutExtension(iconFile));
+                string category = ti.ToTitleCase(Path.GetFileNameWithoutExtension(directory));
+                string icon = $"/icons/{category}/iconFile";
+            }
+        }
+    }
+}   
+
