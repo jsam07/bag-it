@@ -4,13 +4,12 @@
 @using System.Text.Json.Serialization
 @using Microsoft.Extensions.DependencyInjection
 @using Models;
-@inject NavigationManager NavigationManager
+@inject NavigationManager NavManager
 @implements IAsyncDisposable
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <main class="view-category-container">
     <h2>Fruit</h2>
-    <p>@test</p>
     <div>
         <ul>
             @foreach (Product item in itemList.ToArray())
@@ -51,28 +50,42 @@
 @code {
     private HubConnection hubConnection;
     private List<string> messages = new List<string>();
-    public string test = "";
     public List<Product> itemList = new List<Product>();
 
     protected override async Task OnInitializedAsync()
     {
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7210/listHub", options =>
-            { 
-                //options.AccessTokenProvider = () => Task.FromResult(_myAccessToken);
-            })
-            .Build();
-
-        hubConnection.On<string>("ItemsUpdated", (string results) =>
+        try
         {
-            Console.WriteLine(results);
-            itemList = JsonSerializer.Deserialize<List<Product>>(results);
-            StateHasChanged();
-        //AppendList(listArray); 
-    });
+            JWToken jwt = await GetTokenAsync();
 
-        await hubConnection.StartAsync();
-        await hubConnection.InvokeAsync("GetList", "list id");
+            if(jwt == null)
+            {
+                NavigateToLogin();
+                return;
+            }
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:7210/listHub", options =>
+                { 
+                    options.AccessTokenProvider = () => Task.FromResult(jwt.Token);
+                })
+                .Build();
+
+            hubConnection.On<string>("ItemsUpdated", (string results) =>
+            {
+                Console.WriteLine(results);
+                itemList = JsonSerializer.Deserialize<List<Product>>(results);
+                StateHasChanged();
+            //AppendList(listArray); 
+            });
+
+            await hubConnection.StartAsync();
+            await hubConnection.InvokeAsync("GetList", "list id");
+        } catch(Exception e)
+        {
+            Console.WriteLine("Unable to connect to hub");
+            Console.WriteLine(e);
+        }
     }
 
     public void AppendList(List<Product> listArray)
@@ -102,8 +115,29 @@
         await hubConnection.InvokeAsync("AddItemToList", selectedItemName, "1");
     }
 
-        public async Task DeleteItem(string selectedItemName)
+    public async Task DeleteItem(string selectedItemName)
     {
         await hubConnection.InvokeAsync("RemoveItemFromList", selectedItemName);
+    }
+
+    public void NavigateToLogin()
+    {
+        NavManager.NavigateTo("/login");
+    }
+
+
+    public async Task<JWToken> GetTokenAsync()
+    {
+        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
+
+        if(jwt != null)
+        {
+            if(jwt.Expiration <= DateTime.UtcNow)
+            {
+                await localStorage.RemoveItemAsync("token");
+                jwt = null;
+            }
+        }
+        return jwt;
     }
 }

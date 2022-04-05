@@ -4,14 +4,13 @@
 @using System.Net.Http
 @using System.Net.Http.Headers
 @using System.Net.Http.Json
+@using Microsoft.AspNetCore.SignalR.Client
 @using System.Text.Json
-@using Newtonsoft.Json
-@using Newtonsoft.Json.Linq
-@inject NavigationManager NavManager
+@using System.Text.Json.Serialization
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavManager
 
-
-<main>
+ <main>
 @if (userList)
 {
     <div class="list-container">
@@ -65,6 +64,8 @@
     string description = "Suzie's Birthday";
 }
 
+
+
 <style>
     main {
         display: flex;
@@ -111,6 +112,4 @@
     .user-container button {
         margin: 5px;
     }
-
-
 </style>

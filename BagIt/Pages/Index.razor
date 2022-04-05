@@ -5,141 +5,53 @@
 @using Microsoft.Extensions.DependencyInjection
 @using Models;
 @inject NavigationManager NavManager
-@implements IAsyncDisposable
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
-<main class="view-category-container">
-    <h2>Fruit</h2>
-    <p>@test</p>
-    <div>
-        <ul>
-            @foreach (Product item in itemList.ToArray())
-            {
-                <div>
-                    <li>@item.Name
-                        <span>
-                            <button type="button" @onclick="() => DeleteItem(item.Name)">x</button>
-                        </span>
-                    </li>
+<div class="bg-white h-full">
+  <div class="relative overflow-hidden h-full">
+    <main class="h-full">
+      <div class="h-full pt-10 bg-gray-900 sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
+        <div class="mx-auto max-w-7xl lg:px-8">
+          <div class="lg:grid lg:grid-cols-2 lg:gap-8">
+            <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 sm:text-center lg:px-0 lg:text-left lg:flex lg:items-center">
+              <div class="lg:py-24">
+                <h1 class="mt-4 text-4xl tracking-tight font-extrabold text-white sm:mt-5 sm:text-6xl lg:mt-6 xl:text-6xl">
+                  <span class="block">A better way to</span>
+                  <span class="pb-3 block bg-clip-text text-transparent bg-gradient-to-r from-teal-200 to-cyan-400 sm:pb-5">shop for groceries</span>
+                </h1>
+                <p class="text-base text-gray-300 sm:text-xl lg:text-lg xl:text-xl">Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui Lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat.</p>
+                <div class="mt-10 sm:mt-12">
+                  <div class="sm:max-w-xl sm:mx-auto lg:mx-0">
+                    <div class="sm:flex">
+                      <div class="mt-3 sm:mt-0 sm:ml-3">
+                        <button type="button" @onclick="NavigateToRegister" class="block w-full py-3 px-4 rounded-md shadow bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-medium hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-400 focus:ring-offset-gray-900">Register</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-            }
-        </ul>
-    </div>
-    <table class="table-container">
-        <tr>
-            <th></th>
-            <th></th>
-        </tr>
-        <tr>
-            @foreach (string product in products)
-            {
-            <div class="product-description">
-                <td><button type="button" @onclick="() => AddToList(product)">@product</button></td>
+              </div>
             </div>
-            }
-        </tr>
-    </table>
-    <NavLink href="/viewlist" Match="NavLinkMatch.All">
-        <input class="form-button" type="submit" value="My List" />
-	</NavLink>
-</main>
+            <div class="mt-12 -mb-16 sm:-mb-48 lg:m-0 lg:relative">
+              <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
+                <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="/img/hero2.svg" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-@functions {
-    string[] products = { "Bananas", "Apples", "Oranges", "Kiwi", "Jackfruit", "Watermelon", "Peaches", "Starfruit" };
-}
+    </main>
+  </div>
+</div>
 
 @code {
-    private HubConnection hubConnection;
-    private List<string> messages = new List<string>();
-    public string test = "";
-    public List<Product> itemList = new List<Product>();
-
-    protected override async Task OnInitializedAsync()
+    public void NavigateToRegister()
     {
-        try
-        {
-            JWToken jwt = await GetTokenAsync();
-
-            if(jwt == null)
-            {
-                NavigateToLogin();
-                return;
-            }
-
-            hubConnection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:7210/listHub", options =>
-                { 
-                    options.AccessTokenProvider = () => Task.FromResult(jwt.Token);
-                })
-                .Build();
-
-            hubConnection.On<string>("ItemsUpdated", (string results) =>
-            {
-                Console.WriteLine(results);
-                itemList = JsonSerializer.Deserialize<List<Product>>(results);
-                StateHasChanged();
-            //AppendList(listArray); 
-            });
-
-            await hubConnection.StartAsync();
-            await hubConnection.InvokeAsync("GetList", "list id");
-        } catch(Exception e)
-        {
-            Console.WriteLine("Unable to connect to hub");
-            Console.WriteLine(e);
-        }
-    }
-
-    public void AppendList(List<Product> listArray)
-    {
-        foreach (Product item in listArray)
-        {
-            itemList.Add(item);
-        }
-        StateHasChanged();
-    }
-
-    public bool IsConnected =>
-        hubConnection?.State == HubConnectionState.Connected;
-
-    public async ValueTask DisposeAsync()
-    {
-        if (hubConnection is not null)
-        {
-            await hubConnection.DisposeAsync();
-        }
-    }
-
-    //public async void load() => await hubConnection.InvokeAsync("GetList", "list id");
-
-    public async Task AddToList(string selectedItemName)
-    {
-        await hubConnection.InvokeAsync("AddItemToList", selectedItemName, "1");
-    }
-
-    public async Task DeleteItem(string selectedItemName)
-    {
-        await hubConnection.InvokeAsync("RemoveItemFromList", selectedItemName);
+        NavManager.NavigateTo("/register");
     }
 
     public void NavigateToLogin()
     {
         NavManager.NavigateTo("/login");
-    }
-
-
-    public async Task<JWToken> GetTokenAsync()
-    {
-        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
-
-        if(jwt != null)
-        {
-            if(jwt.Expiration <= DateTime.UtcNow)
-            {
-                await localStorage.RemoveItemAsync("token");
-                jwt = null;
-            }
-        }
-        return jwt;
     }
 }

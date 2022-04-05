@@ -1,24 +1,86 @@
-﻿@page "/viewlist"
+﻿@page "/viewlists"
 @using BagIt.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavManager
 
 <form class="form-container">
     <div class="input-container">
-        <input type="text" name="title" value="Smoothie Party" />
-        <input type="text" name="date" value="March 8, 2022" />
+        <InputText @bind="newListInput" type="text" name="title" />
+        <button type="button" @onclick="CreateNewList">New List</button>
     </div>
     <div class="list-container">
         <ul>
-            <li>List 1</li>
-            <li>List 2</li>
-            <li>List 3</li>
+            
         </ul>
-    </div>
-    <div class="button-container">
-        	<NavLink href="/" Match="NavLinkMatch.All">
-                <input class="form-button" type="submit" name="cancel" value="Cancel" />
-			</NavLink>
-            <NavLink href="allcategories" Match="NavLinkMatch.All">
-                <input class="form-button" type="submit" name="save" value="Add" />
-            </NavLink>
+        <p>@userLists? userLists[0].Name : ''</p>
+        
     </div>
 </form>
+
+@code {
+    private HubConnection hubConnection;
+    public List<ShoppingList> userLists = new List<ShoppingList>();
+    public string newListInput;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            JWToken jwt = await GetTokenAsync();
+
+            if(jwt == null)
+            {
+                NavigateToLogin();
+                return;
+            }
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl($"http://localhost:5036/listHub?access_token={jwt.Token}")
+                .Build();
+
+
+            hubConnection.On<string>("ListsUpdated", (string results) =>
+            {
+                Console.WriteLine(results);
+                userLists = JsonSerializer.Deserialize<List<ShoppingList>>(results);
+                StateHasChanged();
+            //AppendList(listArray); 
+            });
+
+            await hubConnection.StartAsync();
+            await hubConnection.InvokeAsync("GetUserLists");
+        } catch(Exception e)
+        {
+            Console.WriteLine("Unable to connect to hub");
+            Console.WriteLine(e);
+        }
+    }
+
+    public void NavigateToLogin()
+    {
+        NavManager.NavigateTo("/login");
+    }
+
+    public async Task CreateNewList()
+    {
+        await hubConnection.InvokeAsync("NewList", newListInput);
+    }
+
+    public async Task<JWToken> GetTokenAsync()
+    {
+        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
+
+        if(jwt != null)
+        {
+            if(jwt.Expiration <= DateTime.UtcNow)
+            {
+                await localStorage.RemoveItemAsync("token");
+                jwt = null;
+            }
+        }
+        return jwt;
+    }
+}
