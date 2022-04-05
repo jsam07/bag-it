@@ -1,21 +1,213 @@
 ﻿@page "/lists"
 @using Models
+@using Pages
 @using System.Net.Http
 @using System.Net.Http.Headers
 @using System.Net.Http.Json
+@using Microsoft.AspNetCore.SignalR.Client
 @using System.Text.Json
-@using Newtonsoft.Json
-@using Newtonsoft.Json.Linq
-@inject NavigationManager NavManager
+@using System.Text.Json.Serialization
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavManager
 
-
-<div class="min-h-full flex">
-  Welcome to list page
-</div>
+ <main>
+@if (!userLists.Any())
+    {
+    <div class="list-container">
+        <div class="text-center">
+            <ul>
+                @foreach (ShoppingList list in userLists.ToArray())
+                {
+                    <li class="mt-2 text-sm font-medium text-gray-900">@list.Name
+                        <span>
+                            @*<button type="button" @onclick="() => DeleteItem(list.ListId)">x</button>*@
+                        </span>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="user-container">
+            <div class="text-center">
+                <button type="button" class="list-add-user bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <img src="./img/user.svg" />
+                </button>
+            </div>
+            <div class="text-center">
+                <button type="button" class="list-add-user bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    +
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="list-container">
+        <div class="text-center">
+            <form class="form-container">
+                <input @bind="newListInput" class="px-4 py-2 border border-transparent w-64" type="text" name="title" placeholder="List Name" />
+                <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent w-64 shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" @onclick="CreateNewList">
+                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    New List
+                </button>
+            </form>
+        </div>
+        </div>
+    } else
+    {
+    <div class="list-container">
+        <div class="text-center">
+            <ul>
+                <li class="mt-2 text-sm font-medium text-gray-900">
+                    Oh no.
+                </li>
+                <li class="mt-2 text-sm font-medium text-gray-900">
+                    You have no list created yet.
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="list-container">
+        <div class="text-center">
+            <form class="form-container">
+                <input @bind="newListInput" class="px-4 py-2 border border-transparent w-64" type="text" name="title" placeholder="List Name" />
+                <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent w-64 shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" @onclick="CreateNewList">
+                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    New List
+                </button>
+            </form>
+        </div>
+    </div>
+    }
+</main>
 
 @code {
+    private HubConnection hubConnection;
+    public List<ShoppingList> userLists = new List<ShoppingList>();
+    public string newListInput;
+    public string name;
 
-    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            JWToken jwt = await GetTokenAsync();
 
-}   
+            if(jwt == null)
+            {
+                NavigateToLogin();
+                return;
+            }
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl($"http://localhost:5036/listHub?access_token={jwt.Token}")
+                .Build();
+
+            hubConnection.On<string>("ListsUpdated", (string results) =>
+            {
+                Console.WriteLine(results);
+                userLists = JsonSerializer.Deserialize<List<ShoppingList>>(results);
+                StateHasChanged();
+            //AppendList(listArray); 
+            });
+
+            await hubConnection.StartAsync();
+            await hubConnection.InvokeAsync("GetUserLists");
+        } catch(Exception e)
+        {
+            Console.WriteLine("Unable to connect to hub");
+            Console.WriteLine(e);
+        }
+    }
+
+    public void NavigateToLogin()
+    {
+        NavManager.NavigateTo("/login");
+    }
+
+    public async Task DeleteItem()
+    {
+        await hubConnection.InvokeAsync("DeleteItem", name);
+    }
+
+    public async Task CreateNewList()
+    {
+        NavManager.NavigateTo("/addList");
+    }
+
+    public async Task<JWToken> GetTokenAsync()
+    {
+        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
+
+        if(jwt != null)
+        {
+            if(jwt.Expiration <= DateTime.UtcNow)
+            {
+                await localStorage.RemoveItemAsync("token");
+                jwt = null;
+            }
+        }
+        return jwt;
+    }
+}
+
+
+<style>
+    input {
+        display: block;
+        border-radius: 5px;
+    }
+
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #white;
+    }
+
+    button {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .list-container {
+        background-color: #F2F2F2;
+        min-width: 320px;
+        padding: 20px;
+        margin: 20px;
+        border-radius: 5px;
+    }
+
+    .list-description {
+        margin-bottom: 20px;
+    }
+
+    .list-add-user {
+        text-align: center;
+        font-size: 30px;
+        border-radius: 50%;
+        color: white;
+        width: 45px;
+        height: 45px;
+    }
+
+    .list-container:hover {
+        cursor: pointer;
+    }
+
+    .user-container {
+        display: flex;
+    }
+
+    .user-container button {
+        margin: 5px;
+    }
+
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
