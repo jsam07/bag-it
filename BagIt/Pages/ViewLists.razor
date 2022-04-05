@@ -8,7 +8,7 @@
 
 <form class="form-container">
     <div class="input-container">
-        <InputText @bind="newListInput" type="text" name="title"  />
+        <InputText @bind="newListInput" type="text" name="title" />
         <button type="button" @onclick="CreateNewList">New List</button>
     </div>
     <div class="list-container">
@@ -22,7 +22,7 @@
 
 @code {
     private HubConnection hubConnection;
-    public List<ShoppingList> userLists;
+    public List<ShoppingList> userLists = new List<ShoppingList>();
     public string newListInput;
 
     protected override async Task OnInitializedAsync()
@@ -38,11 +38,9 @@
             }
 
             hubConnection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:5036/listHub", options =>
-                { 
-                    options.AccessTokenProvider = () => Task.FromResult(jwt.Token);
-                })
+                .WithUrl($"http://localhost:5036/listHub?access_token={jwt.Token}")
                 .Build();
+
 
             hubConnection.On<string>("ListsUpdated", (string results) =>
             {
