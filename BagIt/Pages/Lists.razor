@@ -17,13 +17,21 @@
     <div class="list-container">
         <div class="text-center">
             <h3 class="mt-2 text-sm font-medium text-gray-900">@title</h3>
-            <p class="mt-1 text-sm text-gray-500">@description</p>
+            <p class="list-description mt-1 text-sm text-gray-500">@description</p>
         </div>
-        <div class="text-center">
-            <button type="button" class="list-add-user">
-                +
-            </button>
+        <div class="user-container">
+            <div class="text-center">
+                <button type="button" class="list-add-user bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <img src="./img/user.svg" />
+                </button>
+            </div>
+            <div class="text-center">
+                <button type="button" class="list-add-user bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    +
+                </button>
+            </div>
         </div>
+
     </div>
     <div>
         <NewListCard />
@@ -74,23 +82,35 @@
     .list-container {
         background-color: white;
         min-width: 320px;
-        padding: 1rem;
-        margin: 1rem;
+        padding: 20px;
+        margin: 20px;
         border-radius: 5px;
+    }
+
+    .list-description {
+        margin-bottom: 20px;
     }
 
     .list-add-user {
         text-align: center;
         font-size: 30px;
-        color: darkgray;
         border-radius: 50%;
-        border: solid 3px darkgray;
+        color: white;
         width: 45px;
+        height: 45px;
     }
 
-    .list-add-user:hover {
-        color: #FF3568;
-        border: solid 3px #FF3568;
+    .list-container:hover {
+        cursor: pointer;
     }
+
+    .user-container {
+        display: flex;
+    }
+
+    .user-container button {
+        margin: 5px;
+    }
+
 
 </style>
