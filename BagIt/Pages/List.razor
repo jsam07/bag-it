@@ -17,9 +17,17 @@
 
 
 <div class="bg-white">
+    @* <div>
+        <input @bind-value="SearchTerm" @bind-value:event="oninput" type="text" placeholder="Search" />
+    </div>*@
+    <div class="mx-auto my-4 max-w-3xl border border-gray-300 rounded-md px-3 py-2 shadow-sm focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
+      <label for="name" class="absolute -top-2 left-2 -mt-px inline-block px-1 bg-white text-xs font-medium text-gray-900">Name</label>
+      <input @bind-value="SearchTerm" @bind-value:event="oninput" type="text" name="name" id="name" class="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="Search">
+    </div>
+
   <div class="max-w-7xl mx-auto overflow-hidden sm:px-6 lg:px-8">
     <h2 class="sr-only">Products</h2>
-  <div class="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3 lg:grid-cols-4">
+  <div class="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3 lg:grid-cols-4 mb-16">
             @foreach(Product item in listItems.ToArray())
             {
                 <div class="group relative p-4 border-r border-b border-gray-200 sm:p-6">
@@ -41,10 +49,6 @@
                   </div>
               </div>
             }
-    </div>
-
-    <div>
-        <input @bind-value="SearchTerm" @bind-value:event="oninput" type="text" placeholder="Search" />
     </div>
 
     <div class="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3 lg:grid-cols-4">
@@ -73,12 +77,13 @@
 
 @code {
     List<Product> products = new List<Product>();
-    List<Product> filteredProducts => products.Where(i => i.Name.ToLower().Contains(SearchTerm.ToLower())).ToList();
+    List<Product> filteredProducts => products.Where(i => i.Name.ToLower().Contains(SearchTerm.ToLower()) && SearchTerm.Length > 2).ToList();
     private HubConnection hubConnection;
     private List<string> messages = new List<string>();
     List<Product> listItems = new List<Product>();
     public string SearchTerm {get; set; } = "";
 
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -168,7 +173,12 @@
                 string category = Path.GetFileNameWithoutExtension(directory).Replace("__", " ");
                 string categoryPath = Path.GetFileName(directory);
 
-                string icon = $"/icons/{categoryPath}/{Path.GetFileName(iconFile)}";
+                if (iconFile.Contains(" "))
+                {
+                    FileInfo info = new FileInfo(iconFile);
+                    info.MoveTo(iconFile);
+                }
+                string icon = $"/icons/{categoryPath}/{Path.GetFileName(iconFile).Replace(" ", "")}";
 
 
                 products.Add(
