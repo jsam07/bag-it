@@ -13,7 +13,7 @@
   <div class="flex-1 flex flex-col justify-center mx-8 py-6 lg:flex-none">
     <div class="mx-auto w-full max-w-2xl">
       <div>
-        <img class="w-auto" src="/img/logo.png" alt="Workflow">
+        <img class="w-auto mx-auto" src="/img/hero1.svg" alt="Hero">
         <h2 class="mt-6 text-3xl font-extrabold text-gray-900">Register</h2>
       </div>
 
@@ -177,7 +177,9 @@
             // User Authenticated && Registerd
             var jsonString = await response.Content.ReadAsStringAsync();
             token = JsonConvert.DeserializeObject<JWToken>(jsonString);
-            
+
+            NavigateHome();
+
         } catch (Exception e)
         {
             Console.WriteLine("Error logging in");
@@ -192,6 +194,11 @@
     public void NavigateToLogin()
     {
         NavManager.NavigateTo("/login");
+    }
+
+    public void NavigateHome()
+    {
+        NavManager.NavigateTo("/");
     }
 
 } 
