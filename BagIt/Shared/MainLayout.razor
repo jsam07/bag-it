@@ -1,5 +1,7 @@
 ﻿@inject NavigationManager NavManager
+@using Models;
 @inherits LayoutComponentBase
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <div class="h-full">
 	<header class="relative z-10">
@@ -26,7 +28,7 @@
             </div>
           </div>
           <div class="hidden md:flex md:items-center md:space-x-6">
-            <button type="button" @onclick="NavigateToLogin" class="text-base font-medium text-white hover:text-gray-300"> Log in </button>
+            <button type="button" @onclick="NavigateToLogin" class="text-base font-medium text-white hover:text-gray-300">Log in</button>
             <button type="button" @onclick="NavigateToRegister" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700"> Register </button>
           </div>
         </nav>
@@ -114,4 +116,14 @@
 	{
 		collapseNavMenu = true;
 	}
+
+    public async Task Logout()
+    {
+        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
+
+        if(jwt != null)
+        {
+            await localStorage.RemoveItemAsync("token");
+        }
+    }
 }
