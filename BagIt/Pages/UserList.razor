@@ -1,0 +1,169 @@
+﻿@page "/userList/{ListId:int}"
+
+@using Models
+@using Services;
+@using System.Globalization
+@using Microsoft.AspNetCore.SignalR.Client
+
+@inject NavigationManager NavManager
+@inject ProductInventory ProductInventory;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<div class="bg-white">
+    <button type="button" @onclick="NavigateToLists" class="my-4 ml-8 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+      <!-- Heroicon name: solid/plus -->
+      <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd" />
+      </svg>
+      Back to Lists
+    </button>
+    <div class="mx-6">
+        <div class="mx-auto my-4 max-w-3xl border border-gray-300 rounded-md px-3 py-2 shadow-sm focus-within:ring-1 focus-within:ring-teal-600 focus-within:border-teal-600">
+          <label for="name" class="absolute -top-2 left-2 -mt-px inline-block px-1 bg-white text-xs font-medium text-gray-900">Name</label>
+          <input @bind-value="SearchTerm" @bind-value:event="oninput" type="text" name="name" id="name" class="block w-full mx-6 border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="Search">
+        </div>
+    </div>
+
+  <div class="max-w-7xl mx-auto overflow-hidden sm:px-6 lg:px-8">
+    <h2 class="sr-only">Products</h2>
+  <div class="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3 lg:grid-cols-4 mb-16">
+            @foreach(Product item in listItems.ToArray())
+            {
+                <div class="group relative p-4 border-r border-b border-gray-200 sm:p-6">
+                   <div class="rounded-lg flex flex-col bg-gray-100">
+                    <button type="button" class="ml-auto m-4 red-600" @onclick="() => DeleteItem(item)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600 fill-current" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                  <div class=" overflow-hidden group-hover:opacity-75">
+                    <img src="@item.Icon" alt="@item.Name" class="w-full px-8 h-full object-center object-cover" />
+                  </div>
+                  <h1 class="text-xl my-4 mx-auto font-bold text-gray-900">
+                      @item.Name
+                  </h1>
+              
+                  </div>
+              </div>
+            }
+    </div>
+
+    <div class="-mx-px border-l border-gray-200 grid grid-cols-2 sm:mx-0 md:grid-cols-3 lg:grid-cols-4">
+      @foreach (Product product in filteredProducts)
+      {
+          <div class="group relative p-4 border-r border-b border-gray-200 sm:p-6">
+          <div class="rounded-lg flex flex-col bg-gray-100">
+              <button type="button" class="ml-auto m-4" @onclick="() => AddToList(product)">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 hover:fill-teal-700" viewBox="0 0 20 20" fill="currentColor" >
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                  </svg>
+              </button>
+              <div class=" overflow-hidden group-hover:opacity-75">
+                <img src="@product.Icon" alt="@product.Name" class="w-full px-8 h-full object-center object-cover" />
+              </div>
+              <h1 class="text-xl my-4 mx-auto font-bold text-gray-900">
+                  @product.Name
+              </h1>
+              
+          </div>
+      </div>
+      }
+    </div>
+  </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int ListId{ get; set; }
+
+    private HubConnection hubConnection;
+
+    public string SearchTerm {get; set; } = "";
+
+    List<Product> products = new List<Product>();
+
+    List<Product> listItems = new List<Product>();
+
+    private List<string> messages = new List<string>();
+
+    List<Product> filteredProducts => ProductInventory.FilterProductsByName(SearchTerm);
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            JWToken jwt = await GetTokenAsync();
+
+            if(jwt == null)
+            {
+                NavigateToLogin();
+                return;
+            }
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl($"https://bag-it-api.azurewebsites.net/listHub?access_token={jwt.Token}")
+                .Build();
+
+            hubConnection.On<string>("ItemsUpdated", (string results) =>
+             {
+                 Console.WriteLine(results);
+                 listItems = System.Text.Json.JsonSerializer.Deserialize<List<Product>>(results);
+                 StateHasChanged();
+             });
+
+            await hubConnection.StartAsync();
+            await hubConnection.InvokeAsync("GetList", ListId);
+
+
+        } catch(Exception e)
+        {
+            Console.WriteLine("Unable to connect to hub");
+            Console.WriteLine(e);
+        }
+    }
+
+
+    public void HandleChange()
+    {
+        IEnumerable<Product> query = from product in products where product.Name.Contains(SearchTerm) select product;
+    }
+
+    public async Task AddToList(Product product)
+    {
+        var deserializedProduct = System.Text.Json.JsonSerializer.Serialize(product);
+        await hubConnection.InvokeAsync("AddItemToList", deserializedProduct, ListId);
+    }
+
+    public async Task DeleteItem(Product product)
+    {
+        var deserializedProduct = System.Text.Json.JsonSerializer.Serialize(product);
+        await hubConnection.InvokeAsync("RemoveItemFromList", deserializedProduct, ListId);
+    }
+
+    public void NavigateToLogin()
+    {
+        NavManager.NavigateTo("/login");
+    }
+
+    public void NavigateToLists()
+    {
+        NavManager.NavigateTo($"/lists");
+    }
+
+    public async Task<JWToken> GetTokenAsync()
+    {
+        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
+
+        if(jwt != null)
+        {
+            if(jwt.Expiration <= DateTime.UtcNow)
+            {
+                await localStorage.RemoveItemAsync("token");
+                jwt = null;
+            }
+        }
+        return jwt;
+    }
+}

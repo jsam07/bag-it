@@ -1,11 +1,8 @@
 ﻿@page "/login"
 @using Models
-@using System.Net.Http
-@using System.Net.Http.Headers
-@using System.Net.Http.Json
-@using System.Text.Json
 @using Newtonsoft.Json
-@using Newtonsoft.Json.Linq
+@using System.Net.Http
+@using System.Net.Http.Json
 @inject NavigationManager NavManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
@@ -94,14 +91,14 @@
 @code {
 
     public string Email;
-    public JWToken token;
+    public JWToken Token;
     public string Password;
     public AuthError error;
     public User user = new User();
     static HttpClient client = new HttpClient();
     public string url = "https://bag-it-api.azurewebsites.net/api/user/login";
 
-    protected override async Task OnParametersSetAsync ()
+    protected override async Task OnInitializedAsync ()
     {
         bool isTokenValid = await IsTokenValidAsync();
 
@@ -131,9 +128,9 @@
 
 
             var jsonString = await response.Content.ReadAsStringAsync();
-            token = JsonConvert.DeserializeObject<JWToken>(jsonString);
+            Token = JsonConvert.DeserializeObject<JWToken>(jsonString);
 
-            await localStorage.SetItemAsync("token", token); 
+            await localStorage.SetItemAsync("token", Token); 
 
             NavigateToLists();
 

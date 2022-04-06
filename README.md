@@ -2,6 +2,10 @@
 
 📱 This repository houses the frontend for BagIt. BagIt a mobile application that improves the grocery shopping experience, by allowing users to easily create and share shopping lists.
 
+<p align="center">
+    <img src="./Assets/hero.svg" alt="Hero" height="600"/>
+</p>
+
 ## Architecture
 The BagIt backend is shown below (highlighted in red). The frontend is built using .NET MAUI Blazor.
 <p align="center">
@@ -42,14 +46,14 @@ Once VS Preview is configured, you can run the app in `Debug mode`, using either
 Alternatively, you can *either*:
 - Build the release version of BagIt via the command: `dotnet publish -f:net6.0-android -c:Release -o Publish`
     - The signed apk can then be found in `Publish/com.companyname.bagit-Signed.apk`
--  You can download a pre-build Android App Bundle ![here](https://github.com/jsam07/bag-it/raw/main/Assets/com.companyname.bagit-Signed.apk)
+-  You can download the pre-built apk ![here](https://github.com/jsam07/bag-it/raw/main/Assets/com.companyname.bagit-Signed.apk)
 
 ### 3. Testing BagIt
 
 To test the application, you can either register as a new user or user the following credentials to login:
 
 ```text
-Email: "test@gmail.com"
+Email: "js@gmail.com"
 Password: "123456"
 ```
 
