@@ -10,90 +10,67 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject NavigationManager NavManager
 
- <main>
-@if (userLists.Any())
-    {
-                @foreach (ShoppingList list in userLists.ToArray())
-                {
-                  <div class="list-container">
-                    <div class="text-center">
-                        <h1 class="my-4 text-lg font-medium">@list.Name</h1>
-                        <div class="flex items-center w-full">
-                            <div class="flex -space-x-1 items-center overflow-hidden">
-                              <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
-                            </div>
-                            <div class="text-center">
-                                <span class="sm:ml-3">
-                                  <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
-                                    <!-- Heroicon name: solid/link -->
-                                    <svg class="-ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                      <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
-                                    </svg>
-                                    Share List
-                                  </button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-          }
-    } else
-    {
-    <div class="list-container">
-        <div class="text-center">
-            <ul>
-                <li class="mt-2 text-sm font-medium text-gray-900">
-                    Oh no.
-                </li>
-                <li class="mt-2 text-sm font-medium text-gray-900">
-                    You have no list created yet.
-                </li>
-            </ul>
-        </div>
+
+
+ <div class="rounded-lg bg-gray-200 overflow-hidden shadow divide-y divide-x  divide-gray-200 sm:grid sm:grid-cols-2 sm:gap-px">
+  @foreach (ShoppingList list in UserLists)
+  {
+  <div @onclick="() => NavigateToList(list.ListId)" class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-teal-500">
+    <div>
+      <span class="rounded-lg inline-flex p-3 bg-yellow-50 text-yellow-700 ring-4 ring-white">
+        <!-- Heroicon name: outline/cash -->
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </span>
     </div>
+    <div class="mt-8">
+      <h3 class="text-lg font-medium">
+        <button type="button"class="focus:outline-none text-xl font-medium">
+          <!-- Extend touch target to entire panel -->
+          <span class="absolute inset-0" aria-hidden="true"></span>
+          @list.Name
+        </button>
+      </h3>
+      <p class="mt-2 text-sm text-gray-500">@list.Description</p>
+    </div>
+    <button class="pointer-events-none absolute top-6 right-6 text-gray-300 group-hover:text-gray-400" aria-hidden="true">
+      <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
+      </svg>
+    </button>
+  </div>
+  }
+  </div>
+
+<div class="text-center">
+  <svg class="mx-auto mt-16 h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+    <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+  </svg>
+  @if (!UserLists.Any())
+    {
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No Shopping Lists</h3>
     }
-    <div class="list-container">
-        <div class="text-center">
-            <form class="form-container">
-                <input @bind="newListInput" class="px-4 py-2 border border-transparent w-64" type="text" name="title" placeholder="List Name" />
-                <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent w-64 shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500" @onclick="CreateNewList">
-                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
-                    New List
-                </button>
-            </form>
-        </div>
-    </div>
-</main>
 
-<div class="bg-white shadow sm:rounded-lg">
-<div class="px-4 py-5 sm:p-6">
-<h3 class="text-lg leading-6 font-medium text-gray-900">Update your email</h3>
-<div class="mt-2 max-w-xl text-sm text-gray-500">
-    <p>Change the email address you want associated with your account.</p>
+  <p class="mt-1 text-sm text-gray-500">Get started by creating a new shopping list.</p>
+  <div class="mt-6 inline-flex flex-col">
+    <input @bind="NewListInput" required type="text" name="name" id="name" class="my-4 inline-flex items-center px-4 py-2 border-gray-300 rounded-md shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 placeholder-opacity-25" placeholder="List Name"/>
+    <button @onclick="CreateNewList" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+      <!-- Heroicon name: solid/plus -->
+      <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      Create New List
+    </button>
+  </div>
 </div>
-<div class="mt-5 sm:flex sm:items-center">
-    <div class="w-full sm:max-w-xs">
-    <label for="email" class="sr-only">Email</label>
-    <input type="email" name="email" id="email" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="you@example.com">
-    </div>
-    <button type="submit"  class="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Save</button>
-</div>
-</div>
-</div>
-
 @code {
+
+    public string ListToDelete;
+    public string NewListInput;
     private HubConnection hubConnection;
-    public List<ShoppingList> userLists = new List<ShoppingList>();
-    public string newListInput;
-    public string name;
-
-
-    public async Task InviteUserToList(int listId)
-    {
-        await hubConnection.InvokeAsync("InviteUserToList", listId);
-    }
+    public List<ShoppingList> UserLists = new List<ShoppingList>();
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -108,13 +85,13 @@
             }
 
             hubConnection = new HubConnectionBuilder()
-                .WithUrl($"http://localhost:5036/listHub?access_token={jwt.Token}")
+                .WithUrl($"https://bag-it-api.azurewebsites.net/listHub?access_token={jwt.Token}")
                 .Build();
 
             hubConnection.On<string>("ListsUpdated", (string results) =>
             {
                 Console.WriteLine(results);
-                userLists = JsonSerializer.Deserialize<List<ShoppingList>>(results);
+                UserLists = JsonSerializer.Deserialize<List<ShoppingList>>(results);
                 StateHasChanged();
             });
 
@@ -132,15 +109,24 @@
         NavManager.NavigateTo("/login");
     }
 
+    public void NavigateToList(int ListId)
+    {
+        NavManager.NavigateTo($"/list/{ListId}");
+    }
+
+    public void NavigateToInvite(int id, string ListName)
+    {
+        NavManager.NavigateTo($"/invite/{id}/{ListName}");
+    }
+
     public async Task DeleteItem()
     {
-        await hubConnection.InvokeAsync("DeleteItem", name);
+        await hubConnection.InvokeAsync("DeleteItem", ListToDelete);
     }
 
     public async Task CreateNewList()
     {
-        await hubConnection.InvokeAsync("NewList", newListInput);
-        //NavManager.NavigateTo("/addList");
+        await hubConnection.InvokeAsync("NewList", NewListInput);
     }
 
     public async Task<JWToken> GetTokenAsync()
@@ -158,63 +144,3 @@
         return jwt;
     }
 }
-
-
-<style>
-    input {
-        display: block;
-        border-radius: 5px;
-    }
-
-    main {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: #white;
-    }
-
-    button {
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .list-container {
-        background-color: #F2F2F2;
-        min-width: 320px;
-        padding: 20px;
-        margin: 20px;
-        border-radius: 5px;
-    }
-
-    .list-description {
-        margin-bottom: 20px;
-    }
-
-    .list-add-user {
-        text-align: center;
-        font-size: 30px;
-        border-radius: 50%;
-        color: white;
-        width: 45px;
-        height: 45px;
-    }
-
-    .list-container:hover {
-        cursor: pointer;
-    }
-
-    .user-container {
-        display: flex;
-    }
-
-    .user-container button {
-        margin: 5px;
-    }
-
-    .form-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-</style>
