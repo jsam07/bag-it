@@ -11,7 +11,10 @@ public class ShoppingList
     public bool? IsPublic { get; set; }
     public bool? IsEditable { get; set; }
     public string? Description { get; set; }
-    
+
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<UserShoppingList> UserShoppingLists { get; set; }
+
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<ShoppingListProduct> ShoppingListProducts { get; set; }
 }

@@ -28,7 +28,14 @@
             </div>
           </div>
           <div class="hidden md:flex md:items-center md:space-x-6">
-            <button type="button" @onclick="NavigateToLogin" class="text-base font-medium text-white hover:text-gray-300">Log in</button>
+              @if (isLoggedIn)
+                {
+                        <button type="button" @onclick="Logout" class="text-base font-medium text-white hover:text-gray-300">Logout</button>
+                    } else
+                    {
+                        <button type="button" @onclick="NavigateToLogin" class="text-base font-medium text-white hover:text-gray-300">Login</button>
+                    }
+
             <button type="button" @onclick="NavigateToRegister" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700"> Register </button>
           </div>
         </nav>
@@ -82,9 +89,16 @@
 </div>
 
 @code {
+    private bool isLoggedIn;
     private bool collapseNavMenu = true;
 
-	private string NavMenuVisibilityClass => collapseNavMenu ? "hidden" : "block";
+    private string NavMenuVisibilityClass => collapseNavMenu ? "hidden" : "block";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoggedIn = await IsTokenValidAsync();
+    }
 
     public void NavigateToRegister()
     {
@@ -107,15 +121,34 @@
     }
 
 
-	private void ToggleNavMenu()
-	{
-		collapseNavMenu = !collapseNavMenu;
-	}
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
 
     private void CloseNavMenu()
-	{
-		collapseNavMenu = true;
-	}
+    {
+        collapseNavMenu = true;
+    }
+
+    public async Task<bool> IsTokenValidAsync()
+    {
+
+        JWToken jwt = await localStorage.GetItemAsync<JWToken>("token");
+
+        if(jwt == null)
+        {
+            return false;
+        }
+
+        if(jwt.Expiration <= DateTime.UtcNow)
+        {
+            await localStorage.RemoveItemAsync("token");
+            return false;
+        }
+
+        return true;
+    }
 
     public async Task Logout()
     {
@@ -125,5 +158,6 @@
         {
             await localStorage.RemoveItemAsync("token");
         }
+        isLoggedIn = false;
     }
 }
