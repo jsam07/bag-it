@@ -46,7 +46,7 @@
             }
 
             HubConnection hubConnection = new HubConnectionBuilder()
-                .WithUrl($"http://localhost:5036/listHub?access_token={jwt.Token}")
+                .WithUrl($"https://bag-it-api.azurewebsites.net/listHub?access_token={jwt.Token}")
                 .Build();
 
             await hubConnection.StartAsync();
