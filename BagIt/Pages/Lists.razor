@@ -1,50 +1,68 @@
 ﻿@page "/lists"
 @using Models
-@using Pages
-@using System.Net.Http
-@using System.Net.Http.Headers
-@using System.Net.Http.Json
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Text.Json
-@using System.Text.Json.Serialization
-@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
 @inject NavigationManager NavManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
+<h1 class="text-2xl m-4 font-medium">Shopping Lists</h1>
+<div class="rounded-lg bg-gray-200 overflow-hidden shadow divide-y divide-x  divide-gray-200 sm:grid sm:grid-cols-2 sm:gap-px">
+     @if (UserLists.Any())
+     {
+         <div class="bg-white shadow overflow-hidden sm:rounded-md">
+             <ul role="list" class="divide-y divide-gray-200">
+         @foreach (ShoppingList list in UserLists)
+          {
+                <li>
+                  <div @onclick="() => NavigateToShoppingList(list.ListId)" class="block hover:bg-gray-50">
+                    <div class="px-4 py-4 flex items-center sm:px-6">
+                      <div class="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div class="truncate">
+                          <div class="flex text-sm">
+                            <p class="font-medium text-indigo-600 truncate">@list.Name</p>
+                          </div>
+                          <div class="mt-2 flex">
+                            <div class="flex items-center text-sm text-gray-500">
+                              <!-- Heroicon name: solid/info -->
+                              <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                              </svg>
+                              <p>
+                                @list.Description
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
+                          <div class="flex overflow-hidden -space-x-1">
+                            <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Dries Vincent">
 
+                            <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Lindsay Walton">
 
- <div class="rounded-lg bg-gray-200 overflow-hidden shadow divide-y divide-x  divide-gray-200 sm:grid sm:grid-cols-2 sm:gap-px">
-  @foreach (ShoppingList list in UserLists)
-  {
-  <div @onclick="() => NavigateToList(list.ListId)" class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-teal-500">
-    <div>
-      <span class="rounded-lg inline-flex p-3 bg-yellow-50 text-yellow-700 ring-4 ring-white">
-        <!-- Heroicon name: outline/cash -->
-        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      </span>
-    </div>
-    <div class="mt-8">
-      <h3 class="text-lg font-medium">
-        <button type="button"class="focus:outline-none text-xl font-medium">
-          <!-- Extend touch target to entire panel -->
-          <span class="absolute inset-0" aria-hidden="true"></span>
-          @list.Name
-        </button>
-      </h3>
-      <p class="mt-2 text-sm text-gray-500">@list.Description</p>
-    </div>
-    <button class="pointer-events-none absolute top-6 right-6 text-gray-300 group-hover:text-gray-400" aria-hidden="true">
-      <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
-      </svg>
-    </button>
-  </div>
-  <button type="submit" @onclick="() => NavigateToInvite(list.ListId, list.Name)" class="mx-4 flex-shrink-0 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">Share List</button>
-  }
-  </div>
+                            <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Courtney Henry">
 
-<div class="text-center">
+                            <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Tom Cook">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="ml-5 flex-shrink-0">
+                        <!-- Heroicon name: solid/chevron-right -->
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="submit" @onclick="() => NavigateToInvite(list.ListId, list.Name)" class="mx-4 mb-4 flex-shrink-0 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">Share List</button>
+                </li> 
+             }
+          </ul>
+         </div>
+     }
+ </div>
+
+<div class="text-center mb-6">
   <svg class="mx-auto mt-16 h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
     <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
   </svg>
@@ -71,7 +89,7 @@
     public string NewListInput;
     private HubConnection hubConnection;
     public List<ShoppingList> UserLists = new List<ShoppingList>();
-    
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -110,9 +128,9 @@
         NavManager.NavigateTo("/login");
     }
 
-    public void NavigateToList(int ListId)
+    public void NavigateToShoppingList(int ListId)
     {
-        NavManager.NavigateTo($"/list/{ListId}");
+        NavManager.NavigateTo($"/userList/{ListId}");
     }
 
     public void NavigateToInvite(int id, string ListName)
