@@ -50,7 +50,7 @@ Alternatively, you can *either*:
 
 ### 3. Testing BagIt
 
-To test the application, you can either register as a new user or user the following credentials to login:
+To test the application, you can either register as a new user or use the following credentials to login:
 
 ```text
 Email: "js@gmail.com"
