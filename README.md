@@ -43,10 +43,10 @@ Once VS Preview is configured, you can run the app in `Debug mode`, using either
     <img alt="Search" src="./Assets/menu.png" width="100%"/>
 </p>
 
-Alternatively, you can *either*:
-- Build the release version of BagIt via the command: `dotnet publish -f:net6.0-android -c:Release -o Publish`
+Alternatively, you can do **one** of the following:
+1. Build the release version of BagIt via the command: `dotnet publish -f:net6.0-android -c:Release -o Publish`
     - The signed apk can then be found in `Publish/com.companyname.bagit-Signed.apk`
--  You can download the pre-built apk ![here](https://github.com/jsam07/bag-it/raw/main/Assets/com.companyname.bagit-Signed.apk)
+2.  You can download the pre-built apk ![here](https://github.com/jsam07/bag-it/raw/main/Assets/com.companyname.bagit-Signed.apk)
 
 ### 3. Testing BagIt
 
